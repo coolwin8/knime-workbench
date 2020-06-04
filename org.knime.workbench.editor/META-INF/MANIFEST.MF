@@ -8,6 +8,7 @@ Bundle-ClassPath: editor.jar,
 Bundle-Activator: org.knime.workbench.KNIMEEditorPlugin
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Export-Package: org.knime.workbench,
+ org.knime.workbench.browser,
  org.knime.workbench.descriptionview,
  org.knime.workbench.editor2,
  org.knime.workbench.editor2.actions,

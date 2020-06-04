@@ -17,5 +17,29 @@
             name="Chromium Embedded Framework (CEF) Browser"
             viewClass="org.knime.workbench.cef.wizardnodeview.CEFWizardNodeView">
       </wizardNodeView>
+   </extension>
+   <extension
+         id="org.knime.workbench.cef.browser"
+         name="CEF web browser for welcome page"
+         point="org.eclipse.ui.browserSupport">
+      <support
+            class="org.knime.workbench.cef.browser.WorkbenchBrowserSupport"
+            default="true">
+      </support>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.knime.workbench.cef.browser.BrowserEditor"
+            default="true"
+            icon="icons/knime.png"
+            id="org.knime.workbench.cef.browser"
+            name="Chromium Embedded Web Browser">
+      </editor>
+   </extension>
+   <extension
+         point="org.knime.workbench.editor.BrowserWrapper">
+      <NodeDescBrowserWrapper
+            class="org.knime.workbench.cef.browser.CEFNodeDescBrowserWrapper"></NodeDescBrowserWrapper>
    </extension>   
 </plugin>

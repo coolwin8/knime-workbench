@@ -60,6 +60,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.workbench.browser.BrowserFunctionWrapper;
+import org.knime.workbench.browser.JSViewBrowserWrapper;
 import org.knime.workbench.editor2.WizardNodeView;
 
 /**
@@ -84,9 +86,9 @@ public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, R
      * {@inheritDoc}
      */
     @Override
-    protected BrowserWrapper createBrowserWrapper(final Shell shell) {
+    protected JSViewBrowserWrapper createBrowserWrapper(final Shell shell) {
         final Browser browser = new Browser(shell, SWT.NONE);
-        return new BrowserWrapper() {
+        return new JSViewBrowserWrapper() {
 
             @Override
             public void execute(final String call) {

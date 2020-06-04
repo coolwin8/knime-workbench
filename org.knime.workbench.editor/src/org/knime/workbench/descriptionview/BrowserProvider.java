@@ -65,6 +65,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.knime.core.node.NodeLogger;
+import org.knime.workbench.browser.NodeDescBrowserWrapper;
+import org.knime.workbench.browser.SWTNodeDescBrowserWrapperImpl;
 
 /**
  * The genesis for this class is https://knime-com.atlassian.net/browse/AP-13283 - this class takes care of constructing
@@ -78,7 +80,7 @@ public class BrowserProvider implements LocationListener {
     private static AtomicBoolean IS_GTK_POISON_COMBINATION = null;
 
 
-    private final Browser m_browser;
+    private final NodeDescBrowserWrapper m_browser;
     private final FallbackBrowser m_fallbackBrowser;
 
     /**
@@ -92,20 +94,28 @@ public class BrowserProvider implements LocationListener {
      */
     public BrowserProvider(final Composite parent, final boolean beConcernedAboutGTKWeirdness) {
         Composite compositeToLayout;
-        Browser b;
+        NodeDescBrowserWrapper bw;
         FallbackBrowser fb;
-
         try {
-            if ((IS_GTK_POISON_COMBINATION != null) && IS_GTK_POISON_COMBINATION.get() && beConcernedAboutGTKWeirdness) {
-                b = null;
+            bw = NodeDescBrowserWrapper.getRegisteredNodeDescBrowserWrapper().orElse(null);
+            if (bw != null) {
+                bw.init(parent);
+                fb = null;
+                bw.addLocationListener(this);
+                bw.setText("");
+                compositeToLayout = bw.getComposite();
+            } else if ((IS_GTK_POISON_COMBINATION != null) && IS_GTK_POISON_COMBINATION.get()
+                && beConcernedAboutGTKWeirdness) {
+                bw = null;
                 fb = new FallbackBrowser(parent, false, (SWT.READ_ONLY | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL));
                 compositeToLayout = fb.getStyledText();
             } else {
                 fb = null;
-                b = new Browser(parent, SWT.NONE);
-                b.addLocationListener(this);
-                b.setText("");
-                compositeToLayout = b;
+                Browser b = new Browser(parent, SWT.NONE);
+                bw = new SWTNodeDescBrowserWrapperImpl(b);
+                bw.addLocationListener(this);
+                bw.setText("");
+                compositeToLayout = bw.getComposite();
                 if (IS_GTK_POISON_COMBINATION == null) {
                     b.addPaintListener((event) -> {
                         /*
@@ -146,7 +156,7 @@ public class BrowserProvider implements LocationListener {
             }
         } catch (SWTError e) {
             LOGGER.warn("No html browser for node description available.", e);
-            b = null;
+            bw = null;
             fb = new FallbackBrowser(parent, true, (SWT.READ_ONLY | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL));
             compositeToLayout = fb.getStyledText();
             IS_GTK_POISON_COMBINATION = new AtomicBoolean(true);
@@ -161,7 +171,7 @@ public class BrowserProvider implements LocationListener {
             compositeToLayout.setLayoutData(gd);
         }
 
-        m_browser = b;
+        m_browser = bw;
         m_fallbackBrowser = fb;
     }
 

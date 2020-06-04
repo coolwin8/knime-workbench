@@ -81,6 +81,8 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.workbench.browser.BrowserFunctionWrapper;
+import org.knime.workbench.browser.JSViewBrowserWrapper;
 import org.knime.workbench.core.util.ImageRepository;
 import org.knime.workbench.core.util.ImageRepository.SharedImages;
 import org.knime.workbench.editor2.ElementRadioSelectionDialog.RadioItem;
@@ -104,7 +106,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
     private Shell m_shell;
 
-    private BrowserWrapper m_browserWrapper;
+    private JSViewBrowserWrapper m_browserWrapper;
     private BrowserFunctionInternal m_viewRequestCallback;
     private BrowserFunctionInternal m_updateRequestStatusCallback;
     private BrowserFunctionInternal m_cancelRequestCallback;
@@ -399,9 +401,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      * @param shell the shell to add the browser widget to
      * @return the new browser wrapper instance
      */
-    protected BrowserWrapper createBrowserWrapper(final Shell shell) {
+    protected JSViewBrowserWrapper createBrowserWrapper(final Shell shell) {
         final Browser browser = new Browser(shell, SWT.NONE);
-        return new BrowserWrapper() {
+        return new JSViewBrowserWrapper() {
 
             @Override
             public void execute(final String call) {
@@ -661,7 +663,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
          * @param browser
          * @param name
          */
-        public ViewRequestFunction(final BrowserWrapper browser, final String name) {
+        public ViewRequestFunction(final JSViewBrowserWrapper browser, final String name) {
             super(browser, name);
         }
 
@@ -684,7 +686,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
          * @param browser
          * @param name
          */
-        public UpdateRequestStatusFunction(final BrowserWrapper browser, final String name) {
+        public UpdateRequestStatusFunction(final JSViewBrowserWrapper browser, final String name) {
             super(browser, name);
         }
 
@@ -706,7 +708,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
          * @param browser
          * @param name
          */
-        public CancelRequestFunction(final BrowserWrapper browser, final String name) {
+        public CancelRequestFunction(final JSViewBrowserWrapper browser, final String name) {
             super(browser, name);
         }
 
@@ -729,7 +731,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
          * @param browser
          * @param name
          */
-        public PushSupportedFunction(final BrowserWrapper browser, final String name) {
+        public PushSupportedFunction(final JSViewBrowserWrapper browser, final String name) {
             super(browser, name);
         }
 
@@ -743,50 +745,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
     }
 
-    /**
-     * Wrapper to abstract from specific browser implementations.
-     */
-    @SuppressWarnings("javadoc")
-    protected interface BrowserWrapper {
-
-        void execute(String call);
-
-        void setText(String html, boolean b);
-
-        void setLayoutData(GridData gridData);
-
-        Display getDisplay();
-
-        void addProgressListener(ProgressListener progressListener);
-
-        void setUrl(String absolutePath);
-
-        void setText(String html);
-
-        Shell getShell();
-
-        String evaluate(String evalCode);
-
-        boolean isDisposed();
-
-        BrowserFunctionWrapper registerBrowserFunction(String name, Function<Object[], Object> func);
-
-    }
-
-    @SuppressWarnings("javadoc")
-    protected interface BrowserFunctionWrapper {
-
-        boolean isDisposed();
-
-        void dispose();
-
-    }
-
     private abstract class BrowserFunctionInternal {
 
         private BrowserFunctionWrapper m_browserFunctionWrapper;
 
-        public BrowserFunctionInternal(final BrowserWrapper browserWrapper, final String name) {
+        public BrowserFunctionInternal(final JSViewBrowserWrapper browserWrapper, final String name) {
             m_browserFunctionWrapper = browserWrapper.registerBrowserFunction(name, o -> function(o));
         }
 
