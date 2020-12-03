@@ -95,12 +95,21 @@ public class ReplaceNodePortCommand extends AbstractKNIMECommand {
 
     @Override
     public void execute() {
-        m_undoObject = replaceNodeInternal(getHostWFMUI(), m_affectedNodeID, m_modifiedConfig);
+        m_undoObject = replaceNode(getHostWFMUI(), m_affectedNodeID, m_modifiedConfig);
         // the connections are not always properly re-drawn after "unmark". (Eclipse bug.) Repaint here.
         m_root.refresh();
     }
 
-    private static UndoableUI replaceNodeInternal(final WorkflowManagerUI hostWFM, final NodeID id,
+    /**
+     * Calls {@link WorkflowManagerUI#replaceNode(NodeID, ModifiableNodeCreationConfiguration)}, either synchronously or
+     * asynchronously, depending on the {@link WorkflowManagerUI}-implementation.
+     *
+     * @param hostWFM
+     * @param id
+     * @param config
+     * @return the undo object
+     */
+    public static UndoableUI replaceNode(final WorkflowManagerUI hostWFM, final NodeID id,
         final ModifiableNodeCreationConfiguration config) {
         try {
             return AsyncUtil.wfmAsyncSwitchRethrow(wfm -> {
